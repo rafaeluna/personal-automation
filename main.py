@@ -141,10 +141,6 @@ def main():
 			transactions.append(transaction)
 		elif type(transaction) == list:
 			transactions.extend(transaction)
-		# print(email['id'])
-		# print(email['receivedDateTime'])
-		# print(email['subject'])
-		# print(email['body']['content'])
 
 	pp(transactions)
 
