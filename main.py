@@ -12,6 +12,7 @@ from pprint import pprint as pp
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 sched = BlockingScheduler()
+DEBUG = os.getenv('DEBUG')
 
 MS_GRAPH_URL = 'https://graph.microsoft.com/v1.0'
 TELEGRAM_URL = 'https://api.telegram.org'
@@ -35,6 +36,7 @@ def get_token():
 		'user.readwrite',
 		'mail.read',
 		'mail.send',
+		'mail.readwrite'
 	]
 	# build POST parameters
 	params = {
@@ -131,9 +133,21 @@ def process_email(email):
 
 	return log_data
 
+def delete_emails_in_folder(emails, token, folder_id):
+	headers = {
+		'Authorization': token
+	}
+	for email in emails:
+		subject = email['subject']
+		email_id = email['id']
+
+		print(f'Deleting {subject}... ', end='')
+		url = f'{MS_GRAPH_URL}/me/mailFolders/{folder_id}/messages/{email_id}'
+		response = requests.delete(url, headers=headers)
+		print(response.status_code)
+
 @sched.scheduled_job('interval', minutes=1)
 def main():
-	print(os.getenv('CLIENT_ID'))
 	initialize_firebase()
 	token = get_token()
 	emails = gather_emails(token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
@@ -145,8 +159,6 @@ def main():
 			transactions.append(transaction)
 		elif type(transaction) == list:
 			transactions.extend(transaction)
-
-	pp(transactions)
 
 	for transaction in transactions:
 		transaction['account'] = 'BBVA Crédito'
@@ -160,4 +172,9 @@ def main():
 		}
 		response = requests.post(url, data=data)
 
-sched.start()
+	delete_emails_in_folder(emails, token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
+
+if DEBUG:
+	main()
+else:
+	sched.start()
