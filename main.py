@@ -147,7 +147,6 @@ def delete_emails_in_folder(emails, token, folder_id):
 
 @sched.scheduled_job('interval', minutes=1)
 def main():
-	initialize_firebase()
 	token = get_token()
 	emails = gather_emails(token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
 	
@@ -174,4 +173,5 @@ def main():
 	delete_emails_in_folder(emails, token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
 
 
+initialize_firebase()
 sched.start()
