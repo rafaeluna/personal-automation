@@ -10,6 +10,7 @@ requests = "*"
 firebase-admin = "*"
 beautifulsoup4 = "*"
 pypdf2 = "*"
+apscheduler = "*"
 
 [requires]
 python_version = "3.7"

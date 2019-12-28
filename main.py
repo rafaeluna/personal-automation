@@ -9,6 +9,9 @@ import PyPDF2
 from bs4 import BeautifulSoup
 from firebase_admin import db, credentials
 from pprint import pprint as pp
+from apscheduler.schedulers.blocking import BlockingScheduler
+
+sched = BlockingScheduler()
 
 MS_GRAPH_URL = 'https://graph.microsoft.com/v1.0'
 TELEGRAM_URL = 'https://api.telegram.org'
@@ -128,6 +131,7 @@ def process_email(email):
 
 	return log_data
 
+@sched.scheduled_job('interval', minutes=1)
 def main():
 	print(os.getenv('CLIENT_ID'))
 	initialize_firebase()
@@ -156,5 +160,4 @@ def main():
 		}
 		response = requests.post(url, data=data)
 
-
-main()
+sched.start()
