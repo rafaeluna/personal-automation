@@ -148,31 +148,38 @@ def delete_emails_in_folder(emails, token, folder_id):
 
 @sched.scheduled_job('interval', minutes=1)
 def main():
-	initialize_firebase()
-	token = get_token()
-	emails = gather_emails(token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
+	# initialize_firebase()
+	# token = get_token()
+	# emails = gather_emails(token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
 	
-	transactions = []
-	for email in emails:
-		transaction = process_email(email)
-		if type(transaction) == dict:
-			transactions.append(transaction)
-		elif type(transaction) == list:
-			transactions.extend(transaction)
+	# transactions = []
+	# for email in emails:
+	# 	transaction = process_email(email)
+	# 	if type(transaction) == dict:
+	# 		transactions.append(transaction)
+	# 	elif type(transaction) == list:
+	# 		transactions.extend(transaction)
 
-	for transaction in transactions:
-		transaction['account'] = 'BBVA Crédito'
-		shortcuts_url = 'dcapp://x-callback-url/expense?'
-		params = urllib.parse.urlencode(transaction, quote_via=urllib.parse.quote)
+	# for transaction in transactions:
+	# 	transaction['account'] = 'BBVA Crédito'
+	# 	shortcuts_url = 'dcapp://x-callback-url/expense?'
+	# 	params = urllib.parse.urlencode(transaction, quote_via=urllib.parse.quote)
 
-		url = f'{TELEGRAM_URL}/bot{os.getenv("TELEGRAM_BOT_TOKEN")}/sendMessage'
-		data = {
-			'chat_id': os.getenv('TELEGRAM_CHAT_ID'),
-			'text': shortcuts_url+params
-		}
-		response = requests.post(url, data=data)
+	# 	url = f'{TELEGRAM_URL}/bot{os.getenv("TELEGRAM_BOT_TOKEN")}/sendMessage'
+	# 	data = {
+	# 		'chat_id': os.getenv('TELEGRAM_CHAT_ID'),
+	# 		'text': shortcuts_url+params
+	# 	}
+	# 	response = requests.post(url, data=data)
 
-	delete_emails_in_folder(emails, token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
+	# delete_emails_in_folder(emails, token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
+
+	url = f'{TELEGRAM_URL}/bot{os.getenv("TELEGRAM_BOT_TOKEN")}/sendMessage'
+	data = {
+		'chat_id': os.getenv('TELEGRAM_CHAT_ID'),
+		'text': 'Holis puto'
+	}
+	response = requests.post(url, data=data)
 
 if DEBUG:
 	main()
