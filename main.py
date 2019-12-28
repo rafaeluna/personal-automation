@@ -12,7 +12,6 @@ from pprint import pprint as pp
 from apscheduler.schedulers.blocking import BlockingScheduler
 
 sched = BlockingScheduler()
-DEBUG = os.getenv('DEBUG')
 
 MS_GRAPH_URL = 'https://graph.microsoft.com/v1.0'
 TELEGRAM_URL = 'https://api.telegram.org'
@@ -181,7 +180,5 @@ def main():
 	}
 	response = requests.post(url, data=data)
 
-if DEBUG:
-	main()
-else:
-	sched.start()
+
+sched.start()
