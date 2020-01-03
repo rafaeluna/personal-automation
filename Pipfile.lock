@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "06231e26f82bfb7968fc73982b90f88819c371b143f924bc11a58ea2ab6c332f"
+            "sha256": "c1781ea7cea0ef622a4d3873cc9f29575682c51500d2a461edab73043ac05fa1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -109,18 +109,18 @@
         },
         "google-cloud-firestore": {
             "hashes": [
-                "sha256:5b8e0bd84d98b7ec42abc75b5241a00114777b59ccdfa0df247ac12b16831823",
-                "sha256:7fec7b523ab5e1f87721ca61181114818579bb4d17de768a3993811c9d2aacfe"
+                "sha256:79ff9d491a8b02b7e9a3a176db6376980f7f1086d1118f6a956a7f98dbf8cd10",
+                "sha256:a91b667d8fec2e5b1fdbc3045df6221c139987e76ff7f7ff38d8ecce2732b45e"
             ],
             "markers": "platform_python_implementation != 'PyPy'",
-            "version": "==1.6.0"
+            "version": "==1.6.1"
         },
         "google-cloud-storage": {
             "hashes": [
-                "sha256:9f59c100d3940e38567c48d54cf1a2e7591a2f38e9693dfc11a242d5e54a1626",
-                "sha256:c66e876ae9547884fa42566a2ebfec51d280f488d7a058af9611ba90c78bed78"
+                "sha256:51c1bb892407c2d0ded2e8968c41ea13dbd6ff15b2b18e4a23e4ae0eba68a49e",
+                "sha256:bafe77ba8099b987bfde61347d3b774451877dc31837e296519a0a0d337015f1"
             ],
-            "version": "==1.23.0"
+            "version": "==1.24.1"
         },
         "google-resumable-media": {
             "hashes": [
@@ -223,6 +223,13 @@
             ],
             "version": "==0.6.2"
         },
+        "nltk": {
+            "hashes": [
+                "sha256:bed45551259aa2101381bbdd5df37d44ca2669c5c3dad72439fa459b29137d94"
+            ],
+            "index": "pypi",
+            "version": "==3.4.5"
+        },
         "protobuf": {
             "hashes": [
                 "sha256:0329e86a397db2a83f9dcbe21d9be55a47f963cdabc893c3a24f4d3a8f117c37",
@@ -272,6 +279,7 @@
                 "sha256:1c557d7d0e871de1f5ccd5833f60fb2550652da6be2693c1e02300743d21500d",
                 "sha256:b02c06db6cf09c12dd25137e563b31700d3b80fcc4ad23abb7a315f2789819be"
             ],
+            "index": "pypi",
             "version": "==2019.3"
         },
         "requests": {

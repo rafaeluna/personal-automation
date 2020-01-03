@@ -11,6 +11,8 @@ firebase-admin = "*"
 beautifulsoup4 = "*"
 pypdf2 = "*"
 apscheduler = "*"
+pytz = "*"
+nltk = "*"
 
 [requires]
 python_version = "3.7"
