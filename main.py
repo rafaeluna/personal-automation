@@ -161,7 +161,7 @@ def debit_and_credit_automation():
     print("Debit & Credit Done.\n")
 
 
-@SCHED.scheduled_job('cron', day=2, hour=22, minute=13, second=30, timezone=MEXICO_CITY_TIMEZONE)
+@SCHED.scheduled_job('cron', day=1, hour=9, minute=30, second=0, timezone=MEXICO_CITY_TIMEZONE)
 def facturar_ado():
     '''
     Processes ADO emails, extracts info from their pdfs, and sends them to ADO
