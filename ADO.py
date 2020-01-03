@@ -50,8 +50,6 @@ def facturar_lote(tickets):
     '''
     Factura boletos de ADO en lote o individuales
     '''
-    if len(tickets) < 1:
-        return
 
     print("Facturando lote...")
 
@@ -112,10 +110,18 @@ def facturar_lote(tickets):
     pp(data)
 
     # CRITICAL PART!
-    # Facturar and get download links
-    response = session.post(FACTURAR_URL, data=data)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    pdf_js = soup.find(id='buttondwPDF').get('onclick')
-    xml_js = soup.find(id='buttondwXML').get('onclick')
-    pdf_link = re.search(r'\(\'(.+)\'\)', pdf_js).group(1)
-    xml_link = re.search(r'\(\'(.+)\'\)', xml_js).group(1)
+    # Facturar
+    # response = session.post(FACTURAR_URL, data=data)
+
+    if response.ok:
+        print('Facturación exitosa')
+        # Get download links in case email is not sent
+        soup = BeautifulSoup(response.text, 'html.parser')
+        pdf_js = soup.find(id='buttondwPDF').get('onclick')
+        xml_js = soup.find(id='buttondwXML').get('onclick')
+        pdf_link = re.search(r'\(\'(.+)\'\)', pdf_js).group(1)
+        xml_link = re.search(r'\(\'(.+)\'\)', xml_js).group(1)
+        print(pdf_link)
+        print(xml_link)
+    else:
+        print('Facturación fallida :-(')

@@ -1,3 +1,7 @@
+'''
+Main personal automation module
+'''
+
 import os
 import re
 import urllib
@@ -157,7 +161,7 @@ def debit_and_credit_automation():
     print("Debit & Credit Done.\n")
 
 
-@SCHED.scheduled_job('cron', second=30, timezone=MEXICO_CITY_TIMEZONE)
+@SCHED.scheduled_job('cron', day=2, hour=22, minute=13, second=30, timezone=MEXICO_CITY_TIMEZONE)
 def facturar_ado():
     '''
     Processes ADO emails, extracts info from their pdfs, and sends them to ADO
@@ -175,7 +179,7 @@ def facturar_ado():
         link = soup.find('a', string=re.compile('Boleto'))['href']
         links.append((link, email['id']))
 
-    # Extract info from pdf
+    # Extract info from pdfs
     tickets_info = []
     for link, email_id in links:
         tickets_info.extend(ADO.get_info_from_pdf_link(link, email_id))
@@ -199,9 +203,7 @@ def facturar_ado():
         # Get current date
         current_date = datetime.datetime.now(MEXICO_CITY_TIMEZONE)
         # From current date, go back to first instant of the current month
-        first_instant_of_current_month = current_date.replace(
-            day=1, hour=0, minute=0, second=0, microsecond=0
-        )
+        first_instant_of_current_month = current_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         # From first instant of current month, substract a microsecond to get the last instant of previous month
         last_instant_of_previous_month = first_instant_of_current_month - datetime.timedelta(microseconds=1)
         # From the last instant of that previous month, go to the first instant of that previous month
@@ -222,12 +224,13 @@ def facturar_ado():
     pp(other_tickets)
 
     # Facturar
-    ADO.facturar_lote(main_tickets)
-    ADO.facturar_lote(other_tickets)
+    if len(main_tickets) > 0:
+        ADO.facturar_lote(main_tickets)
+    if len(other_tickets) > 0:
+        ADO.facturar_lote(other_tickets)
 
     # Get info fro
     print("Facturando ADO Done\n")
 
 initialize_firebase()
-facturar_ado()
 SCHED.start()
