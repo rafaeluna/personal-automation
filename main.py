@@ -7,6 +7,7 @@ import re
 import urllib
 import datetime
 
+from datetime import timedelta
 from pprint import pprint as pp
 
 import pytz
@@ -137,6 +138,7 @@ def debit_and_credit_automation():
     token = get_token()
     emails = gather_emails(token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
 
+    # Build transactions from emails
     transactions = []
     for email in emails:
         transaction = DC.process_email(email)
@@ -145,11 +147,15 @@ def debit_and_credit_automation():
         elif type(transaction) == list:
             transactions.extend(transaction)
 
+    # Send all transactions as url-schemes via telegram
     for transaction in transactions:
+
+        # build url-scheme
         transaction['account'] = 'BBVA Crédito'
         shortcuts_url = 'dcapp://x-callback-url/expense?'
         params = urllib.parse.urlencode(transaction, quote_via=urllib.parse.quote)
 
+        # Send message via telegram
         url = f'{TELEGRAM_URL}/bot{os.getenv("TELEGRAM_BOT_TOKEN")}/sendMessage'
         data = {
             'chat_id': os.getenv('TELEGRAM_CHAT_ID'),
@@ -157,6 +163,7 @@ def debit_and_credit_automation():
         }
         requests.post(url, data=data)
 
+    # delete emails
     delete_emails_in_folder(emails, token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
     print("Debit & Credit Done.\n")
 
@@ -203,11 +210,23 @@ def facturar_ado():
         # Get current date
         current_date = datetime.datetime.now(MEXICO_CITY_TIMEZONE)
         # From current date, go back to first instant of the current month
-        first_instant_of_current_month = current_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        # From first instant of current month, substract a microsecond to get the last instant of previous month
-        last_instant_of_previous_month = first_instant_of_current_month - datetime.timedelta(microseconds=1)
-        # From the last instant of that previous month, go to the first instant of that previous month
-        first_instant_of_previous_month = last_instant_of_previous_month.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+        first_instant_of_current_month = current_date.replace(day=1,
+                                                              hour=0,
+                                                              minute=0,
+                                                              second=0,
+                                                              microsecond=0
+                                                              )
+        # From first instant of current month,
+        # substract a microsecond to get the last instant of previous month
+        last_instant_of_previous_month = first_instant_of_current_month - timedelta(microseconds=1)
+        # From the last instant of that previous month,
+        # go to the first instant of that previous month
+        first_instant_of_previous_month = last_instant_of_previous_month.replace(day=1,
+                                                                                 hour=0,
+                                                                                 minute=0,
+                                                                                 second=0,
+                                                                                 microsecond=0
+                                                                                 )
 
         # Check if ticket is in range
         if not first_instant_of_previous_month < ticket_date < last_instant_of_previous_month:
