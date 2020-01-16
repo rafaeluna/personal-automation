@@ -37,7 +37,7 @@ def process_uber(soup):
 
 def process_ado(soup):
     '''
-    Process the soup of an ADO email, searching for transaction data within it"s PDF
+    Processes the soup of an ADO email, searching for transaction data within it"s PDF
     '''
     # Get link to pdf
     link = soup.find("a", string=re.compile("Boleto"))["href"]
@@ -60,6 +60,30 @@ def process_ado(soup):
     }
 
 
+def process_parkimovil(soup):
+    '''
+    Processes soup for Parkimovil email
+    '''
+
+    # Get ammount
+    # Get tag with string "Total:"
+    total_tag = soup.find("strong", string=re.compile("Total:"))
+    # From that tag, go to its parent and get content at index 3, total price should be there
+    total_price_string = total_tag.parent.contents[3]
+    # Get just the digits
+    amount = total_price_string.replace("MX$", "")
+
+    # Get parking location by finding tag with "le agradece su visita."
+    visit_place = re.search(r"<strong>(.+)</strong>\s*le agradece su visita\.", str(soup)).group(1)
+
+    return {
+        "amount": amount,
+        "description": "Estacionamiento",
+        "category": "Servicios",
+        "payee": "Parkimovil",
+        "notes": f"Lugar: {visit_place}"
+    }
+
 
 def process_email(email):
     '''
@@ -81,6 +105,9 @@ def process_email(email):
 
     elif sender == "ADO en Linea":
         log_data = process_ado(soup)
+
+    elif sender == "Parkimovil":
+        log_data = process_parkimovil(soup)
 
     else:
         print(f"No rule for sender '{sender}' with subject '{subject}', skipping...")
