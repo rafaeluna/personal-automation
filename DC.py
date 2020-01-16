@@ -13,34 +13,34 @@ def process_uber_eats(soup):
     '''
     Process the soup of an uber eats email, searching for transaction data
     '''
-    amount = soup.find(text=re.compile(r'MX\$.+')).strip().replace('MX$', '')
-    description = 'Comida'
+    amount = soup.find(text=re.compile(r"MX\$.+")).strip().replace("MX$", "")
+    description = "Comida"
 
     return {
-        'amount': amount,
-        'description': description,
-        'category': 'Comida',
-        'payee': 'Uber Eats'
+        "amount": amount,
+        "description": description,
+        "category": "Comida",
+        "payee": "Uber Eats"
     }
 
 def process_uber(soup):
     '''
     Process the soup of an uber email, searching for transaction data
     '''
-    amount = soup.find(text=re.compile(r'MX\$.+')).strip().replace('MX$', '')
+    amount = soup.find(text=re.compile(r"MX\$.+")).strip().replace("MX$", "")
     return {
-        'amount': amount,
-        'description': 'Uber',
-        'category': 'Taxi',
-        'payee': 'Uber'
+        "amount": amount,
+        "description": "Uber",
+        "category": "Taxi",
+        "payee": "Uber"
     }
 
 def process_ado(soup):
     '''
-    Process the soup of an ADO email, searching for transaction data within it's PDF
+    Process the soup of an ADO email, searching for transaction data within it"s PDF
     '''
     # Get link to pdf
-    link = soup.find('a', string=re.compile('Boleto'))['href']
+    link = soup.find("a", string=re.compile("Boleto"))["href"]
     pdf = requests.get(link).content
     pdf_file = io.BytesIO(pdf)
     reader = PyPDF2.PdfFileReader(pdf_file)
@@ -49,14 +49,14 @@ def process_ado(soup):
     amount = 0
     for page_number in range(num_pages):
         text = reader.getPage(page_number).extractText()
-        amount += float(re.search(r'\$ (.+)PRECIO TOTAL', text).group(1))
+        amount += float(re.search(r"\$ (.+)PRECIO TOTAL", text).group(1))
 
     return {
-        'amount': amount,
-        'description': 'ADO',
-        'category': 'Deudas',
-        'payee': 'ADO',
-        'tag': 'Deudas'
+        "amount": amount,
+        "description": "ADO",
+        "category": "Deudas",
+        "payee": "ADO",
+        "tag": "Deudas"
     }
 
 
@@ -64,22 +64,22 @@ def process_ado(soup):
 def process_email(email):
     '''
     Generic process email for transaction.
-    Depending on sender and subject, sends email's html in soup form to corresponding method
+    Depending on sender and subject, sends email"s html in soup form to corresponding method
     '''
-    soup = BeautifulSoup(email['body']['content'], 'html.parser')
-    sender = email['sender']['emailAddress']['name']
-    subject = email['subject']
+    soup = BeautifulSoup(email["body"]["content"], "html.parser")
+    sender = email["sender"]["emailAddress"]["name"]
+    subject = email["subject"]
 
-    print(f'Processing {subject}')
+    print(f"Processing {subject}")
 
     # Handle Uber and Uber Eats
-    if sender == 'Uber Receipts':
-        if 'Uber Eats' in subject:
+    if sender == "Uber Receipts":
+        if "Uber Eats" in subject:
             log_data = process_uber_eats(soup)
         else:
             log_data = process_uber(soup)
 
-    elif sender == 'ADO en Linea':
+    elif sender == "ADO en Linea":
         log_data = process_ado(soup)
 
     else:
