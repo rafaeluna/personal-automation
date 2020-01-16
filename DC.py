@@ -46,19 +46,18 @@ def process_ado(soup):
     reader = PyPDF2.PdfFileReader(pdf_file)
     num_pages = reader.getNumPages()
 
-    logs = []
+    amount = 0
     for page_number in range(num_pages):
         text = reader.getPage(page_number).extractText()
-        amount = re.search(r'\$ (.+)PRECIO TOTAL', text).group(1)
-        logs.append({
-            'amount': amount,
-            'description': 'ADO',
-            'category': 'Deudas',
-            'payee': 'ADO',
-            'tag': 'Deudas'
-        })
+        amount += float(re.search(r'\$ (.+)PRECIO TOTAL', text).group(1))
 
-    return logs
+    return {
+        'amount': amount,
+        'description': 'ADO',
+        'category': 'Deudas',
+        'payee': 'ADO',
+        'tag': 'Deudas'
+    }
 
 
 
