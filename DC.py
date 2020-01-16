@@ -82,4 +82,8 @@ def process_email(email):
     elif sender == 'ADO en Linea':
         log_data = process_ado(soup)
 
+    else:
+        print(f"No rule for sender '{sender}' with subject '{subject}', skipping...")
+        raise Exception(f"No rule for sender '{sender}' with subject '{subject}'")
+
     return log_data

@@ -140,12 +140,22 @@ def debit_and_credit_automation():
 
     # Build transactions from emails
     transactions = []
+    emails_to_be_deleted = []
     for email in emails:
-        transaction = DC.process_email(email)
+
+        # If no rule found, just skip to next email
+        try:
+            transaction = DC.process_email(email)
+        except:
+            continue
+
         if type(transaction) == dict:
             transactions.append(transaction)
         elif type(transaction) == list:
             transactions.extend(transaction)
+
+        # Add email to delete list
+        emails_to_be_deleted.append(email)
 
     # Send all transactions as url-schemes via telegram
     for transaction in transactions:
@@ -164,7 +174,7 @@ def debit_and_credit_automation():
         requests.post(url, data=data)
 
     # delete emails
-    delete_emails_in_folder(emails, token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
+    delete_emails_in_folder(emails_to_be_deleted, token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
     print("Debit & Credit Done.\n")
 
 
