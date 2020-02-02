@@ -165,12 +165,36 @@ def debit_and_credit_automation():
         shortcuts_url = 'dcapp://x-callback-url/expense?'
         params = urllib.parse.urlencode(transaction, quote_via=urllib.parse.quote)
 
-        # Send message via telegram
-        url = f'{TELEGRAM_URL}/bot{os.getenv("TELEGRAM_BOT_TOKEN")}/sendMessage'
+        # Build message text with format
+
+        '''
+        *Gasto detectado
+
+        *Param1*: value1
+        *Param2*: value2...
+
+        *Date*: Date
+
+        *URL scheme*: D&C URL scheme
+        '''
+
+        text = "*Gasto detectado*\n\n"
+        for key, item in transaction.items():
+            text += f"*{key.title()}*: {item}\n"
+        # Add current date
+        date_string = datetime.datetime.now(MEXICO_CITY_TIMEZONE).strftime("%Y-%m-%d, %H:%M")
+        text += f"\n*Date*: {date_string}\n\n"
+        # Add URL scheme
+        text += f"*D&C URL scheme*: {shortcuts_url+params}"
+
+        # Build post data for telegram
         data = {
-            'chat_id': os.getenv('TELEGRAM_CHAT_ID'),
-            'text': shortcuts_url+params
+            "chat_id": os.getenv("TELEGRAM_CHAT_ID"),
+            "text": text,
+            "parse_mode": "markdown"
         }
+        # Make the POST request
+        url = f'{TELEGRAM_URL}/bot{os.getenv("TELEGRAM_BOT_TOKEN")}/sendMessage'
         requests.post(url, data=data)
 
     # delete emails
