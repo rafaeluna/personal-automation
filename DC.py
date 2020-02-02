@@ -66,7 +66,7 @@ def process_parkimovil(soup):
     '''
 
     # Get ammount
-    # Get tag with string "Total:"
+    # Get <strong> tag with string "Total:"
     total_tag = soup.find("strong", string=re.compile("Total:"))
     # From that tag, go to its parent and get content at index 3, total price should be there
     total_price_string = total_tag.parent.contents[3]
@@ -82,6 +82,28 @@ def process_parkimovil(soup):
         "category": "Servicios",
         "payee": "Parkimovil",
         "notes": f"Lugar: {visit_place}"
+    }
+
+def process_apple_recepit(soup):
+    '''
+    Processes soup for Apple receipt email
+    '''
+    # Get <td> tag whose inner text is "TOTAL"
+    total_tag = soup.find("td", string=re.compile("TOTAL"))
+    # From that tag, go to it's parent, child number 5. Price should be there
+    total_price_string = total_tag.parent.contents[5].text
+    amount = total_price_string.replace("$", "").strip()
+
+    # For description, find all bought items by searching <td> with given class
+    bought_items = soup.find_all("td", class_="item-cell aapl-mobile-cell")
+    # Then, within that <td> find a span whose class is title
+    bought_items = [item.find("span", class_="title").text for item in bought_items]
+
+    return {
+        "amount": amount,
+        "description": ", ".join(bought_items),
+        "category": "Servicios",
+        "payee": "Apple"
     }
 
 
@@ -108,6 +130,9 @@ def process_email(email):
 
     elif sender == "Parkimovil":
         log_data = process_parkimovil(soup)
+
+    elif sender == "Apple" and subject == "Your receipt from Apple.":
+        log_data = process_apple_recepit(soup)
 
     else:
         print(f"No rule for sender '{sender}' with subject '{subject}', skipping...")
