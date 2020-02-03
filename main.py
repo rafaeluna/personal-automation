@@ -29,8 +29,12 @@ SCHED = BlockingScheduler()
 MEXICO_CITY_TIMEZONE = pytz.timezone('America/Mexico_City')
 
 # APIs
-MS_GRAPH_URL = 'https://graph.microsoft.com/v1.0'
-TELEGRAM_URL = 'https://api.telegram.org'
+MS_GRAPH_URL = "https://graph.microsoft.com/v1.0"
+TELEGRAM_URL = "https://api.telegram.org"
+
+# URL Schemes
+DC_EXPENSE_URL_SCHEME = "dcapp://x-callback-url/expense?"
+DC_TRANSFER_URL_SCHEME = "dcapp://x-callback-url/transfer?"
 
 # Months!
 MONTHS = {
@@ -130,12 +134,12 @@ def delete_emails_in_folder(emails, token, folder_id):
 def send_telegram_message(text):
     '''
     Sends a telegram message via PersonalAutomationBot to myself
-    It parses text as markdown
+    It parses text as html
     '''
     data = {
         "chat_id": os.getenv("TELEGRAM_CHAT_ID"),
         "text": text,
-        "parse_mode": "markdown"
+        "parse_mode": "html"
     }
     url = f'{TELEGRAM_URL}/bot{os.getenv("TELEGRAM_BOT_TOKEN")}/sendMessage'
     requests.post(url, data=data)
@@ -174,32 +178,39 @@ def debit_and_credit_automation():
     # Send all transactions as url-schemes via telegram
     for transaction in transactions:
 
+        # Check if it's a transfer by looking for "source_account" in dict
+        if "source_account" in transaction:
+            shortcuts_url = DC_TRANSFER_URL_SCHEME
+            text = "<b>Transferencia detectada</b>\n\n"
+        # Else, it's an expene
+        else:
+            transaction["account"] = "BBVA Crédito"
+            shortcuts_url = DC_EXPENSE_URL_SCHEME
+            text = "<b>Gasto detectado</b>\n\n"
+
         # build url-scheme
-        transaction['account'] = 'BBVA Crédito'
-        shortcuts_url = 'dcapp://x-callback-url/expense?'
         params = urllib.parse.urlencode(transaction, quote_via=urllib.parse.quote)
 
         # Build message text with format
 
         '''
-        *Gasto detectado
+        <b>[transation] detectadx</b>
 
-        *Param1*: value1
-        *Param2*: value2...
+        <b>Param1</b>: value1
+        <b>Param2</b>: value2...
 
-        *Date*: Date
+        <b>Date</b>: Date
 
-        *URL scheme*: D&C URL scheme
+        <b>URL scheme</b>: D&C URL scheme
         '''
 
-        text = "*Gasto detectado*\n\n"
         for key, item in transaction.items():
-            text += f"*{key.title()}*: {item}\n"
+            text += f"<b>{key.title()}</b>: {item}\n"
         # Add current date
         date_string = datetime.datetime.now(MEXICO_CITY_TIMEZONE).strftime("%Y-%m-%d, %H:%M")
-        text += f"\n*Date*: {date_string}\n\n"
+        text += f"\n<b>Date</b>: {date_string}\n\n"
         # Add URL scheme
-        text += f"*D&C URL scheme*: {shortcuts_url+params}"
+        text += f"<b>D&C URL scheme</b>: {shortcuts_url+params}"
         # Send message
         send_telegram_message(text)
 
