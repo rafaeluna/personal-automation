@@ -132,6 +132,21 @@ def process_cinepolis_ticket(soup):
         "notes": theater
     }
 
+def process_bbva_retiro(soup):
+    '''
+    Processes soup for retiro from BBVA email
+    '''
+    # Get <td> tag whose inner text is "Total de la Compra:"
+    amount = soup.find("p", string=re.compile(r"Importe:")).text
+    amount = amount.replace("Importe: $", "").strip()
+
+    return {
+        "amount": amount,
+        "description": "Retiro",
+        "source_account": "BBVA Débito",
+        "destination_account": "Efectivo"
+    }
+
 
 def process_email(email):
     '''
@@ -162,6 +177,9 @@ def process_email(email):
 
     elif sender == "Cineticket Web" and subject == "Confirmación de Orden":
         log_data = process_cinepolis_ticket(soup)
+
+    elif sender == "Clientes BBVA" and subject == "Retiro sin tarjeta":
+        log_data = process_bbva_retiro(soup)
 
     else:
         print(f"No rule for sender '{sender}' with subject '{subject}', skipping...")
