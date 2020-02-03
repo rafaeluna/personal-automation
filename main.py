@@ -18,6 +18,7 @@ import firebase_admin
 from bs4 import BeautifulSoup
 from firebase_admin import db, credentials
 from apscheduler.schedulers.blocking import BlockingScheduler
+from PyPDF2.utils import PdfReadError
 
 import DC
 import ADO
@@ -223,7 +224,10 @@ def facturar_ado():
     # Extract info from pdfs
     tickets_info = []
     for link, email_id in links:
-        tickets_info.extend(ADO.get_info_from_pdf_link(link, email_id))
+        try:
+            tickets_info.extend(ADO.get_info_from_pdf_link(link, email_id))
+        except PdfReadError:
+            print("Unable to read ticket. Ticket is probably cancelled or changed")
 
     # Separate into main and other tickets,
     # and only grab tickets from last month
