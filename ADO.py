@@ -118,10 +118,8 @@ def facturar_lote(tickets):
         # Get download links in case email is not sent
         soup = BeautifulSoup(response.text, 'html.parser')
         pdf_js = soup.find(id='buttondwPDF').get('onclick')
-        xml_js = soup.find(id='buttondwXML').get('onclick')
         pdf_link = re.search(r'\(\'(.+)\'\)', pdf_js).group(1)
-        xml_link = re.search(r'\(\'(.+)\'\)', xml_js).group(1)
-        print(pdf_link)
-        print(xml_link)
-    else:
-        print('Facturación fallida :-(')
+        return pdf_link
+
+    print('Facturación fallida :-(')
+    return None

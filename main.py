@@ -287,9 +287,30 @@ def facturar_ado():
 
     # Facturar
     if len(main_tickets) > 0:
-        ADO.facturar_lote(main_tickets)
+        pdf_link = ADO.facturar_lote(main_tickets)
+
+        # Send Telegram message
+        text = "*Facturación detectada ADO*\n\n"
+        # Check if facturación was successful
+        if pdf_link is None:
+            text += "Facturación fallida"
+        else:
+            text += f"*PDF Link*: {pdf_link}"
+        # Send message
+        send_telegram_message(text)
+
     if len(other_tickets) > 0:
-        ADO.facturar_lote(other_tickets)
+        pdf_link = ADO.facturar_lote(other_tickets)
+
+        # Send Telegram message
+        text = "*Facturación detectada ADO*\n\n"
+        # Check if facturación was successful
+        if pdf_link is None:
+            text += "Facturación fallida"
+        else:
+            text += f"*PDF Link*: {pdf_link}"
+        # Send message
+        send_telegram_message(text)
 
     # Get info fro
     print("Facturando ADO Done\n")
