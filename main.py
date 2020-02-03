@@ -127,6 +127,19 @@ def delete_emails_in_folder(emails, token, folder_id):
         print(response.status_code)
 
 
+def send_telegram_message(text):
+    '''
+    Sends a telegram message via PersonalAutomationBot to myself
+    It parses text as markdown
+    '''
+    data = {
+        "chat_id": os.getenv("TELEGRAM_CHAT_ID"),
+        "text": text,
+        "parse_mode": "markdown"
+    }
+    url = f'{TELEGRAM_URL}/bot{os.getenv("TELEGRAM_BOT_TOKEN")}/sendMessage'
+    requests.post(url, data=data)
+
 
 @SCHED.scheduled_job('interval', minutes=1)
 def debit_and_credit_automation():
@@ -187,16 +200,8 @@ def debit_and_credit_automation():
         text += f"\n*Date*: {date_string}\n\n"
         # Add URL scheme
         text += f"*D&C URL scheme*: {shortcuts_url+params}"
-
-        # Build post data for telegram
-        data = {
-            "chat_id": os.getenv("TELEGRAM_CHAT_ID"),
-            "text": text,
-            "parse_mode": "markdown"
-        }
-        # Make the POST request
-        url = f'{TELEGRAM_URL}/bot{os.getenv("TELEGRAM_BOT_TOKEN")}/sendMessage'
-        requests.post(url, data=data)
+        # Send message
+        send_telegram_message(text)
 
     # delete emails
     delete_emails_in_folder(emails_to_be_deleted, token, os.getenv('DEBIT_AND_CREDIT_FOLDER_ID'))
