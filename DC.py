@@ -106,6 +106,32 @@ def process_apple_recepit(soup):
         "payee": "Apple"
     }
 
+def process_cinepolis_ticket(soup):
+    '''
+    Processes soup for Cinépolis ticket email
+    '''
+    # Get <td> tag whose inner text is "Total de la Compra:"
+    total_tag = soup.find("td", string=re.compile("Total de la Compra:"))
+    # From that tag, go to it's parent, child number 5. Price should be there
+    total_price_string = total_tag.parent.contents[5].text
+    amount = total_price_string.replace("$", "").strip()
+
+    # For description, get <td> whose inner text is "Película:" search from there and process text
+    movie_title = soup.find("span", string=re.compile("Película:"))
+    movie_title = movie_title.parent.contents[3].text.title().replace("Sub", "")
+
+    # For notes, find movie theater by same method as above
+    theater = soup.find("span", string=re.compile("Cine:"))
+    theater = theater.parent.contents[3].text.title()
+
+    return {
+        "amount": amount,
+        "description": movie_title,
+        "category": "Entretenimiento",
+        "payee": "Cinépolis",
+        "notes": theater
+    }
+
 
 def process_email(email):
     '''
@@ -133,6 +159,9 @@ def process_email(email):
 
     elif sender == "Apple" and subject == "Your receipt from Apple.":
         log_data = process_apple_recepit(soup)
+
+    elif sender == "Cineticket Web" and subject == "Confirmación de Orden":
+        log_data = process_cinepolis_ticket(soup)
 
     else:
         print(f"No rule for sender '{sender}' with subject '{subject}', skipping...")
