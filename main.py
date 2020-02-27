@@ -164,7 +164,7 @@ def debit_and_credit_automation():
         # If no rule found, just skip to next email
         try:
             transaction = DC.process_email(email)
-        except:
+        except Exception:
             continue
 
         if type(transaction) == dict:
@@ -326,5 +326,6 @@ def facturar_ado():
     # Get info fro
     print("Facturando ADO Done\n")
 
-initialize_firebase()
-SCHED.start()
+if __name__ == "__main__":
+    initialize_firebase()
+    SCHED.start()
